@@ -1,0 +1,97 @@
+program PiscatprisFisher;
+
+{$DEFINE SMART}              // Always have this to load smart
+{$I SRL-6/SRL.simba}         // To load the SRL include files
+{$I SPS/lib/SPS-RS3.Simba}   // To load the SPS include files
+
+  //Script by Neko - https://villavu.com/forum/member.php?u=91763
+
+
+  type TBankerInfo = record
+    DTM: integer;
+    name: string;
+    mouseOverText: array of string;
+  end;
+
+  var
+    bankTPoint: TPoint; bankerDTM: integer; fishDTM: integer; bankttlf: string;
+    fishttlf: string; xp, fishcount, price, fishPath: TPointArray;
+    banker: TBankerInfo;
+
+
+
+procedure declarePlayers();
+begin
+  setLength(players, 1);
+  with players[0] do
+  begin
+    loginName := 'username';
+    password := 'password';
+    isActive := true;
+    isMember := true;
+  end
+  currentPlayer := 0;
+end;
+
+procedure initInstall();
+begin
+  writeln('initInstall is not functioning at this point, this is a placeholder')
+  //https://goo.gl/Rp9V5M
+end;
+
+procedure doFishing();
+begin
+    fishttlf := 'et Fishing spot';
+end;
+
+procedure doBanking();
+begin
+    banker.DTM := DTMFromString('mLgAAAHicY2JgYHgNxDqMDAwiQDoTiGcWKjAc3XCUQRLIFgBiRihmYAAAi8IFJw==');
+    banker.name := 'Banker'
+    banker.mouseOverText := ['ank Banker'];
+end;
+
+procedure walkToFish();
+begin
+  fishPath := [Point(248, 283), Point(279, 260), Point(291, 221), Point(332, 198), Point(347, 180)];
+
+  if SPS.walkPath(fishPath) then
+    minimap.waitPlayerMoving()
+  else
+  begin
+    writeln('Failed to walk to fish');
+  end;
+end;
+
+
+procedure walkToBank();
+begin
+  minimap.findSymbol(bankTPoint, MM_SYMBOL_BANK, minimap.getBounds);
+  mouse(bankTPoint, MOUSE_LEFT);
+end;
+
+// main loop
+begin
+  clearDebug();               // Clear the debug box
+  smartEnableDrawing := true; // So we can draw on SMART
+  setupSRL();                   // Load the SRL include files
+  declarePlayers();             // Set up your username/pass
+  initInstall();
+  SPS.setup('Piscatpris_SPS', RUNESCAPE_OTHER)
+
+  if not isLoggedIn() then             // If player isn't logged in then
+  begin
+    players[currentPlayer].login();   // Log them in
+    claimTicket();
+    exitTreasure();            // Exit treasure hunter
+    minimap.setAngle(MM_DIRECTION_NORTH);  // Make compass north and angle high
+    mainScreen.setAngle(MS_ANGLE_HIGH);
+    while isLoggedIn() do
+    begin
+        walkToBank();
+        doBanking();
+        walkToFish();
+        doFishing();
+    end;
+  end;
+end.
